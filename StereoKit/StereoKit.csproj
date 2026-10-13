@@ -38,6 +38,8 @@
 	<!-- Files and DLLs that are needed for the NuGet package -->
 	<ItemGroup>
 		<None    Pack="true" Visible="false" Include="../tools/img/StereoKitLogo64.png" PackagePath="images/" />
+		<None Pack="true" Visible="false" Include="../LICENSE" PackagePath="/" />
+		<Content Pack="true" Visible="false" Include="../bin/zipzap-package/provenance.json" PackagePath="zipzap/provenance.json" Condition="'$(PackageId)' == 'ZipZap.StereoKit'" />
 
 		<Content Pack="true" Visible="false" Include="../bin/$(TargetFramework)/StereoKit.pdb" PackagePath="lib/$(TargetFramework)/" />
 		
@@ -78,12 +80,21 @@
 
 		<!-- Targets and copies and commands for the NuGet package once it's in
 		the user's project. -->
-		<Content Pack="true" Include="StereoKit.targets" PackagePath="build/" />
-		<Content Pack="true" Include="StereoKit.props"   PackagePath="build/" />
+		<Content Pack="true" Include="StereoKit.targets" PackagePath="build/$(PackageId).targets" />
+		<Content Pack="true" Include="StereoKit.props"   PackagePath="build/$(PackageId).props" />
 		<Content Pack="true" Include="SKAssets.targets"  PackagePath="build/" />
 		<Content Pack="true" Include="SKShaders.targets" PackagePath="build/" />
 		<Content Pack="true" Include="SKShader.xml"      PackagePath="build/" />
 	</ItemGroup>
+
+	<Target Name="ZipZapValidatePackageFiles" BeforeTargets="GenerateNuspec" Condition="'$(PackageId)' == 'ZipZap.StereoKit'">
+		<Error Condition="!Exists('../bin/distribute/bin/Win32/x64/Release/StereoKitC.dll')" Text="[ZipZap NuGet] Missing Windows x64 runtime." />
+		<Error Condition="!Exists('../bin/distribute/bin/Android/arm64-v8a/Release/libStereoKitC.so')" Text="[ZipZap NuGet] Missing Android arm64 runtime." />
+		<Error Condition="!Exists('../bin/distribute/bin/Android/arm64-v8a/Release/standard/libopenxr_loader.so')" Text="[ZipZap NuGet] Missing Android OpenXR loader." />
+		<Error Condition="!Exists('../bin/distribute/bin/Android/sk_app.jar')" Text="[ZipZap NuGet] Missing Android Java support." />
+		<Error Condition="!Exists('../bin/tools/win32_x64/skshaderc.exe')" Text="[ZipZap NuGet] Missing Windows shader compiler." />
+		<Error Condition="!Exists('../bin/zipzap-package/provenance.json')" Text="[ZipZap NuGet] Missing source/build provenance." />
+	</Target>
 
 	<!-- Error if we're missing binaries for release builds! -->
 	<Target Name="SKErrPlatformFiles" AfterTargets="BeforeBuild" BeforeTargets="CoreBuild" Condition="'$(GeneratePackageOnBuild)'=='true' and '$(SKIgnoreMissingBinaries)' != 'true'">

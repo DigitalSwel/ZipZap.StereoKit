@@ -36,7 +36,7 @@
 		<AndroidNativeLibrary Abi="arm64-v8a" Include="$(MSBuildThisFileDirectory)../runtimes/android-arm64/native/libStereoKitC.so">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</AndroidNativeLibrary>
-		<AndroidNativeLibrary Abi="x86_64" Include="$(MSBuildThisFileDirectory)../runtimes/android-x64/native/libStereoKitC.so">
+		<AndroidNativeLibrary Abi="x86_64" Include="$(MSBuildThisFileDirectory)../runtimes/android-x64/native/libStereoKitC.so" Condition="Exists('$(MSBuildThisFileDirectory)../runtimes/android-x64/native/libStereoKitC.so')">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</AndroidNativeLibrary>
 		<AndroidNativeLibrary Condition="'$(SKOpenXRLoader)'!='None'" Abi="arm64-v8a" Include="$(MSBuildThisFileDirectory)../android_openxr_loaders/$(SKOpenXRLoader.ToLower())/arm64/*.so">

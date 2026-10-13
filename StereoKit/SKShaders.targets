@@ -100,7 +100,8 @@
 		<!-- The second asset folder pattern catches '..' relative folders, which
 		     the '**/' prefixed pattern can't match. -->
 		<SKShaderCode Condition="'$(SKBuildShaderCode)'=='true'" Include="$(SKShaderCodeFolderNormalized)$(SKShaderCodeSearch)*.hlsl;$(SKShaderCodeFolderNormalized)$(SKShaderCodeSearch)*.svsl" Exclude="**/bin/**;**/obj/**;**/$(SKAssetFolder)/**;$(SKAssetFolderNormalized)**"/>
-		<UpToDateCheckInput Include="@(SKShaderCode)"/>
+		<SKShaderCodeDependency Include="$(SKShadercPath);$(MSBuildThisFileFullPath);$(IncludeFolderNormalized)/*.hlsli"/>
+		<UpToDateCheckInput Include="@(SKShaderCode);@(SKShaderCodeDependency)"/>
 
 		<Compile Include="@(SKShaderCode->'$(IntermediateOutputPath)%(RecursiveDir)Material%(Filename).gen.cs')" KeepDuplicates="false">
 			<DependentUpon>@(SKShaderCode->'%(Identity)')</DependentUpon>
@@ -112,12 +113,15 @@
 	</ItemGroup>
 
 	<!-- Compile the shaders and generate the C# in the /obj/ folder -->
-	<Target Name="StereoKit_Shader_Code" BeforeTargets="BeforeCompile" Inputs="@(SKShaderCode->'%(FullPath)')" Outputs="@(SKShaderCode->'$(IntermediateOutputPath)%(RecursiveDir)Material%(Filename).gen.cs')">
+	<!-- Compiler/target/header changes invalidate cached embedded bytecode, not only HLSL edits. -->
+	<Target Name="StereoKit_Shader_Code" Condition="'@(SKShaderCode)'!=''" BeforeTargets="BeforeCompile" Inputs="@(SKShaderCode->'%(FullPath)');@(SKShaderCodeDependency)" Outputs="@(SKShaderCode->'$(IntermediateOutputPath)%(RecursiveDir)Material%(Filename).gen.cs')">
 		<Message Text="[StereoKit NuGet] Generating C# for %(SKShaderCode.Identity) -> $(IntermediateOutputPath)%(SKShaderCode.RecursiveDir)Material%(SKShaderCode.Filename).gen.cs" Importance="high" />
 
-		<Exec Command='"$(SKShadercPath)" $(SKOpt) $(SKShaderSVSL) -e -sk -i "$(IncludeFolderNormalized)" "%(SKShaderCode.Identity)" -o "$(IntermediateOutputPath)%(SKShaderCode.RecursiveDir)Material%(SKShaderCode.Filename).gen.cs"'></Exec>
+		<!-- MSBuild owns incremental checks; force compilation once dependencies are stale. -->
+		<Exec Command='"$(SKShadercPath)" $(SKOpt) $(SKShaderSVSL) -f -e -sk -i "$(IncludeFolderNormalized)" "%(SKShaderCode.Identity)" -o "$(IntermediateOutputPath)%(SKShaderCode.RecursiveDir)Material%(SKShaderCode.Filename).gen.cs"'></Exec>
 
 		<ItemGroup>
+			<FileWrites Include="@(SKShaderCode->'$(IntermediateOutputPath)%(RecursiveDir)Material%(Filename).gen.cs')"/>
 			<Compile Remove ="@(SKShaderCode->'$(IntermediateOutputPath)%(RecursiveDir)Material%(Filename).gen.cs')"/>
 			<Compile Include="@(SKShaderCode->'$(IntermediateOutputPath)%(RecursiveDir)Material%(Filename).gen.cs')" KeepDuplicates="false">
 				<DependentUpon>@(SKShaderCode->'%(Identity)')</DependentUpon>
