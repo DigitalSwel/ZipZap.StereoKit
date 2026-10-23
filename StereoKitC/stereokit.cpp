@@ -12,6 +12,8 @@
 #include "systems/system.h"
 #include "systems/_stereokit_systems.h"
 #include "systems/vert_format.h"
+#include "asset_types/assets.h"
+#include "asset_types/texture_compression.h"
 #include "systems/frame_pacer.h"
 #include "libraries/sokol_time.h"
 #include "libraries/ferr_thread.h"
@@ -182,10 +184,12 @@ void sk_shutdown() {
 void sk_shutdown_unsafe(void) {
 	log_show_any_fail_reason();
 
+	assets_drain          (); // Tasks can touch any system, so they finish before any shut down
 	systems_shutdown      ();
 	// The vertex format registry initializes with skr in platform_init, and
 	// must shut down with skr too — wherever skr_shutdown goes, this goes.
 	vert_format_sys_shutdown();
+	texture_compression_gpu_shutdown();
 	skr_shutdown          (); // I'd prefer to do this in Platform, but refactoring may be needed to make that happen
 	sk_mem_log_allocations();
 	log_clear_subscribers ();

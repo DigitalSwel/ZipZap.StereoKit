@@ -240,6 +240,7 @@ endif()
 set(SKR_ENABLE_STATIC_ANALYSIS OFF CACHE BOOL "Faster build" FORCE)
 set(SKR_BUILD_EXAMPLES OFF CACHE BOOL "Faster build" FORCE)
 set(SKR_BUILD_KTX2 ON CACHE BOOL "KTX2 texture loading" FORCE)
+set(SKR_BUILD_TEXENC ON CACHE BOOL "GPU texture compression" FORCE)
 # If we're only using the SVSL shader compiler, we can drop glslang from
 # skshaderc and save ourselves a lot of binary size and build time!
 if (SK_USE_SVSL)
@@ -704,6 +705,7 @@ target_link_libraries( StereoKitC
     ${CMAKE_DL_LIBS}
     meshoptimizer
     sk_ktx2
+    sk_texenc
     zstd_decompress
   PUBLIC
     sk_app
@@ -749,6 +751,7 @@ target_link_options   (StereoKitC PUBLIC ${SK_LINKER_FLAGS})
 if (ANDROID)
   target_link_options(StereoKitC PRIVATE
     "-Wl,--exclude-libs,libsk_ktx2.a"
+    "-Wl,--exclude-libs,libsk_texenc.a"
     "-Wl,--exclude-libs,libzstd_decompress.a"
     "-Wl,--exclude-libs,libmeshoptimizer.a")
 elseif (NOT MSVC AND NOT APPLE)
@@ -992,8 +995,12 @@ if (SK_BUILD_TESTS AND NOT ANDROID AND NOT SK_BUILD_SHARED_LIBS)
     tools/tests/asset_tests.cpp
     tools/tests/sh_tests.h
     tools/tests/sh_tests.cpp
+    tools/tests/texcompress_tests.h
+    tools/tests/texcompress_tests.cpp
     tools/tests/spatial_tests.h
     tools/tests/spatial_tests.cpp
+    tools/tests/tex_tests.h
+    tools/tests/tex_tests.cpp
     tools/tests/future_tests.h
     tools/tests/future_tests.cpp
   )
