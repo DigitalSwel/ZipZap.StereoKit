@@ -188,6 +188,16 @@ namespace StereoKit
 		#endregion
 
 		#region Methods
+
+		/// <summary>Checks concrete format support for an uploaded, readable 2D
+		/// sampled texture. Call on the SK thread after SK.Initialize and before
+		/// preloading native-only content. Returns false before initialization
+		/// or when this backend cannot establish support.</summary>
+		/// <param name="format">Exact native format, including color space.</param>
+		/// <param name="linearFilter">Require linear sampling as well.</param>
+		/// <returns>Whether the requested sampling usage is supported.</returns>
+		public static bool SupportsSampling(TexFormat format, bool linearFilter = true)
+			=> NativeAPI.tex_format_supports_sampling(format, linearFilter ? 1 : 0) != 0;
 		
 		/// <summary>Copy the current texture into a new texture, with the
 		/// option to convert it to a different format or type! This is a GPU

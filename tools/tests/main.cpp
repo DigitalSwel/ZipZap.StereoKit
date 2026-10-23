@@ -15,6 +15,7 @@
 #include "texcompress_tests.h"
 #include "spatial_tests.h"
 #include "tex_tests.h"
+#include "astc6_loader_tests.h"
 #include "future_tests.h"
 
 #include <stdio.h>
@@ -45,6 +46,7 @@ int main(int argc, char* argv[]) {
 	if (all || has_flag(argc, argv, "-texcompresstest")) failures += texcompress_tests_run();
 	if (all || has_flag(argc, argv, "-spatialtest"))     failures += spatial_tests_run();
 	if (all || has_flag(argc, argv, "-textest"))         failures += tex_tests_run();
+	if (all || has_flag(argc, argv, "-astc6test"))        failures += astc6_loader_tests_run();
 	if (all || has_flag(argc, argv, "-futuretest"))      failures += future_tests_run();
 
 	if (has_flag(argc, argv, "-audiobench")) failures += audio_bench_run();

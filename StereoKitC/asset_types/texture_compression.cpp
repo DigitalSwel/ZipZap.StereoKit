@@ -1,4 +1,5 @@
 #include "texture_compression.h"
+#include "ktx2_astc6.h"
 #include "texture_.h"
 #include "../sk_memory.h"
 #include "../libraries/profiler.h"
@@ -154,6 +155,25 @@ static bool ktx2_prepare(void* data, size_t data_size, ktx2_reader_t* out_reader
 
 ///////////////////////////////////////////
 
+// This sized format bypasses the Basis transcoder. Keep the shared preflight
+// for info, synchronous decode and the cooperative loader.
+static bool ktx2_astc6_prepare(void* data, size_t bytes, ktx2_astc6_t* out_view) {
+	if (!ktx2_astc6_open(data, bytes, out_view)) {
+		log_warn("KTX2 ASTC6 rejected: invalid header, DFD, ranges or Zstd framing.");
+		return false;
+	}
+	if (!tex_format_supports_sampling(tex_format_astc6x6_rgba_srgb, true)) {
+		log_warn("KTX2 ASTC6 sRGB unsupported for sampled upload with linear filtering; select portable content before loading.");
+		return false;
+	}
+	skr_vec3i_t size = { out_view->width, out_view->height, 1 };
+	if (skr_tex_calc_mip_size(skr_tex_fmt_astc6x6_rgba_srgb, size, 0) != out_view->decoded_bytes) {
+		log_err("KTX2 ASTC6 size disagreement with sk_renderer.");
+		return false;
+	}
+	return true;
+}
+
 // Layers and cube faces are both just images to us, and the file orders them
 // layer-then-face. ktx2_prepare rejects anything carrying both.
 static int32_t ktx2_image_count(const ktx2_info_t* info) {
@@ -163,6 +183,16 @@ static int32_t ktx2_image_count(const ktx2_info_t* info) {
 ///////////////////////////////////////////
 
 bool ktx2_info(void* data, size_t data_size, tex_type_* ref_image_type, tex_format_* out_format, int32_t* out_width, int32_t* out_height, int32_t* out_array_count, int32_t* out_mip_count) {
+	if (ktx2_astc6_matches(data, data_size)) {
+		ktx2_astc6_t view = {};
+		if (!ktx2_astc6_prepare(data, data_size, &view)) return false;
+		*out_format = tex_format_astc6x6_rgba_srgb;
+		*out_width = view.width;
+		*out_height = view.height;
+		*out_array_count = 1;
+		*out_mip_count = 1;
+		return true;
+	}
 	ktx2_reader_t reader = {};
 	ktx2_plan_t   plan   = {};
 	if (!ktx2_prepare(data, data_size, &reader, &plan)) return false;
@@ -182,6 +212,17 @@ bool ktx2_info(void* data, size_t data_size, tex_type_* ref_image_type, tex_form
 ///////////////////////////////////////////
 
 bool ktx2_decode(void* data, size_t data_size, tex_type_* ref_image_type, tex_format_* out_format, int32_t* out_width, int32_t* out_height, int32_t* out_array_count, int32_t* out_mip_count, void** out_data) {
+	if (ktx2_astc6_matches(data, data_size)) {
+		*out_data = nullptr;
+		ktx2_slice_t* slice = ktx2_decode_begin(data, data_size, ref_image_type, out_format, out_width, out_height, out_array_count, out_mip_count, out_data);
+		if (!slice) return false;
+		int32_t level = 0;
+		bool done = false;
+		bool success = ktx2_decode_step(slice, &level, &done) && done;
+		ktx2_decode_end(slice);
+		if (!success) { sk_free(*out_data); *out_data = nullptr; }
+		return success;
+	}
 	ktx2_reader_t reader = {};
 	ktx2_plan_t   plan   = {};
 	if (!ktx2_prepare(data, data_size, &reader, &plan)) return false;
@@ -238,6 +279,8 @@ bool ktx2_sniff(const void* data, size_t data_size) {
 ///////////////////////////////////////////
 
 struct ktx2_slice_t {
+	ktx2_astc6_t astc6;
+	bool         is_astc6;
 	ktx2_reader_t reader;
 	ktx2_plan_t   plan;      // points at this struct's own reader
 	void*         scratch;
@@ -251,6 +294,21 @@ struct ktx2_slice_t {
 
 ktx2_slice_t* ktx2_decode_begin(void* data, size_t data_size, tex_type_* ref_image_type, tex_format_* out_format, int32_t* out_width, int32_t* out_height, int32_t* out_array_count, int32_t* out_mip_count, void** out_data) {
 	ktx2_slice_t* slice = sk_malloc_zero_t(ktx2_slice_t, 1);
+	if (ktx2_astc6_matches(data, data_size)) {
+		if (!ktx2_astc6_prepare(data, data_size, &slice->astc6)) {
+			sk_free(slice);
+			return nullptr;
+		}
+		slice->is_astc6 = true;
+		slice->out = static_cast<uint8_t*>(sk_malloc(slice->astc6.decoded_bytes));
+		*out_data = slice->out;
+		*out_format = tex_format_astc6x6_rgba_srgb;
+		*out_width = slice->astc6.width;
+		*out_height = slice->astc6.height;
+		*out_array_count = 1;
+		*out_mip_count = 1;
+		return slice;
+	}
 	if (!ktx2_prepare(data, data_size, &slice->reader, &slice->plan)) {
 		sk_free(slice);
 		return nullptr;
@@ -285,6 +343,16 @@ ktx2_slice_t* ktx2_decode_begin(void* data, size_t data_size, tex_type_* ref_ima
 }
 
 bool ktx2_decode_step(ktx2_slice_t* slice, int32_t* out_level, bool* out_done) {
+	if (slice->is_astc6) {
+		if (slice->level_curr != 0 || !ktx2_astc6_decode(slice->astc6, slice->out, slice->astc6.decoded_bytes)) {
+			log_warn("KTX2 ASTC6 decode failed: invalid block payload or Zstd checksum.");
+			return false;
+		}
+		slice->level_curr = 1;
+		*out_level = 0;
+		*out_done = true;
+		return true;
+	}
 	int32_t level = slice->level_curr;
 	size_t  bytes = (size_t)slice->images * skr_tex_calc_mip_size((skr_tex_fmt_)slice->format, slice->base_size, level);
 

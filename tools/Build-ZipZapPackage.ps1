@@ -5,6 +5,7 @@ param(
     [string]$NinjaPath = '',
     [ValidateRange(1, 999999)][int]$Revision = 1,
     [ValidateRange(1, 64)][int]$Jobs = 8,
+    [string]$LogDirectory = '.tmp/stereokit-package',
     [switch]$PackOnly
 )
 
@@ -13,7 +14,11 @@ $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $packageId = 'ZipZap.StereoKit'
 $feed = Join-Path $repoRoot 'bin/nuget-feed'
 $packageWork = Join-Path $repoRoot 'bin/zipzap-package'
-$logs = Join-Path $repoRoot '.tmp/stereokit-package'
+$logs = [IO.Path]::GetFullPath((Join-Path $repoRoot $LogDirectory))
+$scratchRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot '.tmp')) + [IO.Path]::DirectorySeparatorChar
+if (-not $logs.StartsWith($scratchRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'LogDirectory must stay inside repository-root .tmp/.'
+}
 
 function Invoke-BuildCommand {
     param([string]$Executable, [string[]]$Arguments, [string]$LogName)

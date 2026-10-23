@@ -375,7 +375,10 @@ target_sources(StereoKitC PRIVATE
   StereoKitC/asset_types/texture_.h
   StereoKitC/asset_types/texture.cpp
   StereoKitC/asset_types/texture_compression.h
-  StereoKitC/asset_types/texture_compression.cpp )
+  StereoKitC/asset_types/texture_compression.cpp
+  StereoKitC/asset_types/texture_format_support.cpp
+  StereoKitC/asset_types/ktx2_astc6.h
+  StereoKitC/asset_types/ktx2_astc6.cpp )
 
 # Vendored libraries
 target_sources(StereoKitC PRIVATE
@@ -977,6 +980,16 @@ endif()
 ## SKTests                               ##
 ###########################################
 
+# CPU-only sized KTX tests also run without an ASTC-capable GPU.
+if (SK_BUILD_TESTS AND NOT ANDROID)
+  enable_testing()
+  add_executable(SKKtx2Tests tools/tests/ktx2_astc6_tests.cpp StereoKitC/asset_types/ktx2_astc6.cpp)
+  set_target_properties(SKKtx2Tests PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON)
+  target_link_libraries(SKKtx2Tests PRIVATE zstd_decompress)
+  target_compile_definitions(SKKtx2Tests PRIVATE SK_ASTC6_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/tools/tests/fixtures/astc6")
+  add_test(NAME SKKtx2Tests COMMAND SKKtx2Tests)
+endif()
+
 # Headless native test runner (tools/tests). Each suite self-inits SK in
 # offscreen mode, so it needs no window, shaders, or assets - just StereoKitC.
 # Desktop only: it's a CLI test binary, not an interactive app. The suites
@@ -1001,6 +1014,8 @@ if (SK_BUILD_TESTS AND NOT ANDROID AND NOT SK_BUILD_SHARED_LIBS)
     tools/tests/spatial_tests.cpp
     tools/tests/tex_tests.h
     tools/tests/tex_tests.cpp
+    tools/tests/astc6_loader_tests.h
+    tools/tests/astc6_loader_tests.cpp
     tools/tests/future_tests.h
     tools/tests/future_tests.cpp
   )
@@ -1008,6 +1023,7 @@ if (SK_BUILD_TESTS AND NOT ANDROID AND NOT SK_BUILD_SHARED_LIBS)
   # See the StereoKitCTest note: pin the standard so u8 literals stay char.
   set_target_properties(SKTests PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED ON)
 
+  target_compile_definitions(SKTests PRIVATE SK_ASTC6_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/tools/tests/fixtures/astc6")
   target_link_libraries( SKTests PRIVATE StereoKitC )
   if (SK_DYNAMIC_OPENXR)
     target_link_libraries( SKTests PRIVATE openxr_loader )

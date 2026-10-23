@@ -1,0 +1,199 @@
+{
+  "date": "2026-10-22",
+  "tool": {
+    "astc": true,
+    "version": "ktx version: v4.4.2",
+    "error": null
+  },
+  "sources": [
+    {
+      "file": "astc6-left.png",
+      "sha256": "832c77175e8f4192931bbb2ff021fb536dbef2e343570f801718216af167f412",
+      "frameSetSha256": "e74b54d7eb0b3d1127000af094e4888d7bbeeda6c78491a9b69d44681ab75db1"
+    },
+    {
+      "file": "astc6-right.png",
+      "sha256": "01c467b36d66dba7b4ad90b448da80b2f254d73a01a259028d57506d68a047f7",
+      "frameSetSha256": "883208d05bec8572b4069edc8e6b5f6e837cc6478940828eb48ba467eb1ecec5"
+    }
+  ],
+  "sourceEyeSizePx": {
+    "width": 29,
+    "height": 21
+  },
+  "frameCount": 1,
+  "fixtures": [
+    {
+      "file": "astc6-none.pack",
+      "textureFile": "astc6-none.ktx2",
+      "encoding": {
+        "codec": "astc-ldr-6x6",
+        "astcQuality": "thorough",
+        "supercompression": "none",
+        "mipmaps": {
+          "mode": "none",
+          "levelCount": 1
+        }
+      },
+      "bytes": 3024,
+      "sha256": "de6e0606ca60575c3427d81635387ddb63e6547cde368a1456d6871184f44c6e",
+      "textureBytes": 912,
+      "textureSha256": "7a5c5f70c5871d18ff16e8b147c47b3c1cba57db37d5954d1e77f2911e4c4457",
+      "inflatedLevelSha256": "b589489498107fdbab6c0f1cd0e0e3b42130b164fa3dbe359c0dab71ecbdeaad",
+      "storedLevelBytes": 640,
+      "inflatedLevelBytes": 640,
+      "width": 60,
+      "height": 24,
+      "geometry": {
+        "coordinateConvention": "pixel-edges-top-left-x-right-y-down",
+        "sourceEyeSizePx": {
+          "width": 29,
+          "height": 21
+        },
+        "cropRectPx": {
+          "x": 2,
+          "y": 3,
+          "width": 21,
+          "height": 15
+        },
+        "eyeTileSizePx": {
+          "width": 30,
+          "height": 24
+        },
+        "contentRectInEyeTilePx": {
+          "x": 4,
+          "y": 4,
+          "width": 21,
+          "height": 15
+        },
+        "sourceToEyeTileTransform": [
+          1,
+          0,
+          0,
+          1,
+          2,
+          1
+        ],
+        "pivotSourcePx": [
+          14.5,
+          21
+        ],
+        "pivotEyeTilePx": [
+          16.5,
+          22
+        ],
+        "trimScope": "clip",
+        "alphaBoundsThreshold": 0.00392156862745098
+      },
+      "producer": {
+        "stereoRunId": "synthetic-astc6-fixture",
+        "leftFrameSetSha256": "e74b54d7eb0b3d1127000af094e4888d7bbeeda6c78491a9b69d44681ab75db1",
+        "rightFrameSetSha256": "883208d05bec8572b4069edc8e6b5f6e837cc6478940828eb48ba467eb1ecec5",
+        "encoderVersion": "ktx version: v4.4.2",
+        "codecArgument": "ASTC_6x6_SRGB_BLOCK",
+        "encoderArguments": [
+          "create",
+          "--format",
+          "ASTC_6x6_SRGB_BLOCK",
+          "--astc-quality",
+          "thorough",
+          "--assign-tf",
+          "srgb",
+          "--assign-primaries",
+          "bt709",
+          "--assign-texcoord-origin",
+          "top-left"
+        ]
+      }
+    },
+    {
+      "file": "astc6-zstd9.pack",
+      "textureFile": "astc6-zstd9.ktx2",
+      "encoding": {
+        "codec": "astc-ldr-6x6",
+        "astcQuality": "thorough",
+        "supercompression": "zstd",
+        "zstdLevel": 9,
+        "mipmaps": {
+          "mode": "none",
+          "levelCount": 1
+        }
+      },
+      "bytes": 2854,
+      "sha256": "474965e3e2b8e48e7dfe7c12bb0cd6eb16680b184d66419a94b00ad3be42b7bd",
+      "textureBytes": 678,
+      "textureSha256": "430f049cbbeb5c815c678f2f9e28b67a6503813d47537c5ff7068ffca8a9c3f6",
+      "inflatedLevelSha256": "b589489498107fdbab6c0f1cd0e0e3b42130b164fa3dbe359c0dab71ecbdeaad",
+      "storedLevelBytes": 402,
+      "inflatedLevelBytes": 640,
+      "width": 60,
+      "height": 24,
+      "geometry": {
+        "coordinateConvention": "pixel-edges-top-left-x-right-y-down",
+        "sourceEyeSizePx": {
+          "width": 29,
+          "height": 21
+        },
+        "cropRectPx": {
+          "x": 2,
+          "y": 3,
+          "width": 21,
+          "height": 15
+        },
+        "eyeTileSizePx": {
+          "width": 30,
+          "height": 24
+        },
+        "contentRectInEyeTilePx": {
+          "x": 4,
+          "y": 4,
+          "width": 21,
+          "height": 15
+        },
+        "sourceToEyeTileTransform": [
+          1,
+          0,
+          0,
+          1,
+          2,
+          1
+        ],
+        "pivotSourcePx": [
+          14.5,
+          21
+        ],
+        "pivotEyeTilePx": [
+          16.5,
+          22
+        ],
+        "trimScope": "clip",
+        "alphaBoundsThreshold": 0.00392156862745098
+      },
+      "producer": {
+        "stereoRunId": "synthetic-astc6-fixture",
+        "leftFrameSetSha256": "e74b54d7eb0b3d1127000af094e4888d7bbeeda6c78491a9b69d44681ab75db1",
+        "rightFrameSetSha256": "883208d05bec8572b4069edc8e6b5f6e837cc6478940828eb48ba467eb1ecec5",
+        "encoderVersion": "ktx version: v4.4.2",
+        "codecArgument": "ASTC_6x6_SRGB_BLOCK",
+        "encoderArguments": [
+          "create",
+          "--format",
+          "ASTC_6x6_SRGB_BLOCK",
+          "--astc-quality",
+          "thorough",
+          "--assign-tf",
+          "srgb",
+          "--assign-primaries",
+          "bt709",
+          "--assign-texcoord-origin",
+          "top-left"
+        ],
+        "deflateArguments": [
+          "deflate",
+          "--zstd",
+          "9"
+        ]
+      }
+    }
+  ]
+}
