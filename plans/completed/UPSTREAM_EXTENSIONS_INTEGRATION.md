@@ -16,9 +16,9 @@
 2. [x] Record the upstream integration separately from extension isolation.
 3. [x] Isolate extension implementation, native/managed API declarations, build wiring, compatibility additions, and tests without a generic plugin framework.
 4. [x] Add focused coverage for dispatch, invalid recognized inputs, extension-disabled behavior, and retained public APIs.
-5. [ ] Validate core-only and enabled native builds, CPU tests, available native loader smoke tests, managed build, and Android native build.
-6. [ ] Review the final patch, commit the refactor, and build/inspect a new immutable local package from committed source.
-7. [ ] After required checks pass, merge locally into `develop` and move this plan into `plans/completed/`.
+5. [x] Validate core-only and enabled native builds, CPU tests, available native loader smoke tests, managed build, and Android native build.
+6. [x] Review the final patch, commit the refactor, and build/inspect a new immutable local package from committed source.
+7. [x] After required checks pass, merge locally into `develop` and move this plan into `plans/completed/`.
 
 ## Validation and artifacts
 
@@ -38,5 +38,10 @@
 - Managed API/compile compatibility tests passed in both modes: 11 checks each; core-only assembly omits extension methods.
 - Integration portability fix: upstream compression tests used identifiers named `small`, which collide with a Windows SDK macro. Renamed only those test-local identifiers to permit MSVC validation.
 - Host reports no ASTC6 sampled/linear support. Unsupported-format rejection and portable UASTC loads passed; native ASTC6 GPU upload/visual validation remains a device qualification gap, not a host validation claim.
-- Android/release package validation and final local develop merge are pending.
+- Refactor/source commit: `73380854999375d817ebb0963fa8aa3e92d933ae`. Staged review and PowerShell syntax validation passed; no unresolved correctness findings.
+- Windows x64 and Android arm64 Release builds, Java support build, and package identity/payload/hash inspection passed.
+- Local package: `bin/nuget-feed/ZipZap.StereoKit.0.4.0-zipzap.4.g733808549993.nupkg`.
+- Package SHA256: `bdeb31fef773ad8408fd8b583abb1af830b2add5177ccf910f99c01fd5965809`.
+- Isolated Windows offscreen probe against the extracted package passed: 11 API checks; native P/Invoke preflight before/after initialization; native ASTC6 explicitly rejected on this unsupported GPU; both portable UASTC fixtures loaded; clean shutdown.
+- Local `develop` fast-forwarded to the validated integration. No push, consumer changes, hosted publication, or device installation performed. Added an upstream Git remote for future fetch/integration workflows.
 - Verification logs: `.tmp/upstream-extensions/` (ignored; not committed).

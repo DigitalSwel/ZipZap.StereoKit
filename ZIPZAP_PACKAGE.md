@@ -4,7 +4,17 @@ Shared fork for Reveal and GargsVR. Upstream source remains in the `StereoKit` n
 
 See [ZipZap extension boundaries and upstream updates](ZIPZAP_EXTENSIONS.md) for the optional native/managed extension build, compatibility boundary, and integration workflow. Package builds explicitly enable the extensions on both native platforms and in the managed assembly. The original package adoption/consumer validation recorded below does not automatically apply to a newer integration or package.
 
-## Baseline and supported build
+## Latest local extension integration
+
+- Integrated upstream PR #1429 head `2b6ef4b2084ee9054d1bbe2f170f323c6545034f`; upstream merge commit `60375acb` and isolated extension source commit `73380854999375d817ebb0963fa8aa3e92d933ae`.
+- New local package: **`ZipZap.StereoKit/0.4.0-zipzap.4.g733808549993`**, in `bin/nuget-feed/`.
+- Package SHA256: `bdeb31fef773ad8408fd8b583abb1af830b2add5177ccf910f99c01fd5965809`.
+- Windows x64 / Android arm64 Release builds and package payload/provenance inspection passed. Native core-only and extension-enabled tests passed; managed API tests passed 11 checks in each mode; CPU parser passed 1741 checks.
+- An isolated Windows offscreen probe using the extracted package passed API checks, P/Invoke preflight, unsupported native ASTC6 rejection, both UASTC fixture loads, and shutdown.
+- Consumer pins, APKs, and device installs were not changed. Physical Quest ASTC6 upload/visual acceptance and the earlier minimize/restore lifecycle gap were not requalified.
+- Completed scope and results: [upstream/extension integration plan](plans/completed/UPSTREAM_EXTENSIONS_INTEGRATION.md).
+
+## Original package baseline and supported build
 
 - Source baseline: `b8cc3af2619c012ef47579f424756508879f77b1` on `develop`.
 - Current local consumer pin: **`ZipZap.StereoKit/0.4.0-zipzap.2.gb8cc3af2619c`**.
@@ -65,7 +75,7 @@ All relevant Reveal/GargsVR host, presentation, validation/probe and ZipZap.Engi
 
 Before adopting a new version, restore/build both Windows and Quest hosts, run applicable CPU tests, inspect resolved assets, and perform isolated native smoke checks. Native tests are not built by the package script; headset visuals/performance and device install are separate validations. No headset data reset or production install is part of packaging.
 
-## Current validation and limits
+## Original consumer validation and limits
 
 - Full native build/pack script completed and inspected revision 2. Both consumer Windows Debug/Release and Quest Release builds passed; Gargs native probe/Quest validation hosts also built.
 - Both consumer/engine dependency graphs resolve exactly revision 2 with no official `StereoKit` dependency. Restored payload hashes, both Windows output DLLs and both signed Quest APK native runtime/OpenXR entries match package provenance.
