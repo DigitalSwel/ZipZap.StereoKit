@@ -1014,18 +1014,19 @@ namespace StereoKit
 		/// compression, and is treated like linear data for now.</summary>
 		Normal       = 1 << 1,
 		/// <summary>The alpha channel is unused, so StereoKit may pick a format without
-		/// one.</summary>
+		/// one. HDR data with an alpha channel, like floating point colors, only
+		/// compresses with this, since compressed HDR formats have no alpha.</summary>
 		Opaque       = 1 << 2,
 		/// <summary>Alpha is only a cutout mask, so 1 bit of alpha is enough.</summary>
 		Cutout       = 1 << 3,
 		/// <summary>Never compress this texture. Use this for textures you read back on
 		/// the CPU, or small images that need to stay pixel exact.</summary>
-		Uncompressed = 1 << 8,
+		CompressNone = 1 << 8,
 		/// <summary>Compress this texture, preferring quality over size. This wins over
-		/// small, and uncompressed wins over this.</summary>
-		Quality      = 1 << 9,
+		/// compress_small, and compress_none wins over this.</summary>
+		CompressQuality = 1 << 9,
 		/// <summary>Compress this texture, preferring a small size over quality.</summary>
-		Small        = 1 << 10,
+		CompressSmall = 1 << 10,
 		/// <summary>Finish the work before the call returns, so the texture is loaded (or
 		/// failed) right away. Without this, the work happens on the asset system,
 		/// and the texture keeps its previous content until the new content is
