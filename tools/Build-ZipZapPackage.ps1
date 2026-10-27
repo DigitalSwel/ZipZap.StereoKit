@@ -53,11 +53,11 @@ if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[a-f0-9]{40}$') {
     throw 'Cannot identify source commit.'
 }
 # Packaging edits may be uncommitted; runtime changes must have committed provenance.
-& $git -C $repoRoot diff --quiet HEAD -- StereoKitC 'StereoKit/*.cs' 'StereoKit/**/*.cs' CMakeLists.txt cmake CMakePresets.json
+& $git -C $repoRoot diff --quiet HEAD -- StereoKitC 'StereoKit/*.cs' 'StereoKit/**/*.cs' StereoKit/ZipZap CMakeLists.txt cmake CMakePresets.json
 if ($LASTEXITCODE -ne 0) {
     throw 'Runtime/native build source differs from HEAD. Commit it before creating a release package.'
 }
-$untrackedRuntimeSource = @(& $git -C $repoRoot ls-files --others --exclude-standard -- StereoKitC 'StereoKit/*.cs' 'StereoKit/**/*.cs' CMakeLists.txt cmake CMakePresets.json)
+$untrackedRuntimeSource = @(& $git -C $repoRoot ls-files --others --exclude-standard -- StereoKitC 'StereoKit/*.cs' 'StereoKit/**/*.cs' StereoKit/ZipZap CMakeLists.txt cmake CMakePresets.json)
 if ($LASTEXITCODE -ne 0 -or $untrackedRuntimeSource.Count -ne 0) {
     throw 'Runtime/native build source contains untracked files. Commit them before creating a release package.'
 }
@@ -109,14 +109,21 @@ try {
         $env:PATH = "$(Split-Path $CMakePath);$(Split-Path $NinjaPath);$(Join-Path $JavaHome 'bin');$env:PATH"
         $env:CPM_SOURCE_CACHE = (Join-Path $repoRoot '.deps_cache').Replace('\', '/')
 
-        Invoke-BuildCommand $CMakePath @('--preset', 'Win32_x64_Release', '-DSK_BUILD_TESTS=OFF') 'configure-win'
+        Invoke-BuildCommand $CMakePath @('--preset', 'Win32_x64_Release', '-DSK_BUILD_TESTS=OFF', '-DSK_ZIPZAP_EXTENSIONS=ON') 'configure-win'
         Invoke-BuildCommand $CMakePath @('--build', '--preset', 'Win32_x64_Release', '--target', 'StereoKitC', '--parallel', "$Jobs") 'build-win'
         $hostShaderCompiler = (Join-Path $repoRoot 'bin/tools/win32_x64/skshaderc.exe').Replace('\', '/')
         Invoke-BuildCommand $CMakePath @('--preset', 'Android_Arm64_Release', "-DCMAKE_MAKE_PROGRAM=$($NinjaPath.Replace('\', '/'))",
-            "-DSKSHADERC_HOST_EXE=$hostShaderCompiler", '-DSKSHADERC_BUILD_HOST_TOOL=OFF', '-DSK_BUILD_TESTS=OFF') 'configure-android'
+            "-DSKSHADERC_HOST_EXE=$hostShaderCompiler", '-DSKSHADERC_BUILD_HOST_TOOL=OFF', '-DSK_BUILD_TESTS=OFF', '-DSK_ZIPZAP_EXTENSIONS=ON') 'configure-android'
         # Upstream's distribute copy expects the Java target to have been built explicitly.
         Invoke-BuildCommand $CMakePath @('--build', '--preset', 'Android_Arm64_Release', '--target', 'sk_app_jar', '--parallel', "$Jobs") 'build-android-java'
         Invoke-BuildCommand $CMakePath @('--build', '--preset', 'Android_Arm64_Release', '--target', 'StereoKitC', '--parallel', "$Jobs") 'build-android'
+    }
+
+    foreach ($preset in @('Win32_x64', 'Android_Arm64_Release')) {
+        $cache = Join-Path $repoRoot "bin/intermediate/$preset/CMakeCache.txt"
+        if (-not (Test-Path $cache) -or -not (Select-String -Path $cache -Pattern '^SK_ZIPZAP_EXTENSIONS:BOOL=ON$' -Quiet)) {
+            throw "Package requires an extension-enabled native build: $preset."
+        }
     }
 
     $requiredFiles = [ordered]@{
@@ -141,6 +148,7 @@ try {
         runtimeIdentifiers = @('win-x64', 'android-arm64')
         shaderHost = 'win-x64'
         nativeTestsIncluded = $false
+        zipZapExtensions = $true
         binarySha256 = $binaryHashes
     }
     [IO.File]::WriteAllText((Join-Path $packageWork 'provenance.json'), ($manifest | ConvertTo-Json -Depth 8), [Text.UTF8Encoding]::new($false))
@@ -151,7 +159,7 @@ try {
         "-p:PackageId=$packageId", "-p:Version=$version", "-p:PackageVersion=$version", "-p:Title=$packageId",
         '-p:PackageProjectUrl=https://github.com/DigitalSwel/ZipZap.StereoKit',
         '-p:RepositoryUrl=https://github.com/DigitalSwel/ZipZap.StereoKit', "-p:RepositoryCommit=$commit",
-        '-p:ContinuousIntegrationBuild=true') 'pack'
+        '-p:ContinuousIntegrationBuild=true', '-p:ZipZapExtensions=true') 'pack'
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $stagedPackage = Join-Path $staging "$packageId.$version.nupkg"

@@ -1835,9 +1835,6 @@ SK_API tex_t        tex_gen_particle        (int32_t width, int32_t height, floa
 SK_API tex_t        tex_gen_cubemap         (const gradient_t gradient, vec3 gradient_dir, int32_t resolution);
 SK_API tex_t        tex_gen_cubemap_sh      (const sk_ref(spherical_harmonics_t) lookup, int32_t face_size, float light_spot_size_pct sk_default(0), float light_spot_intensity sk_default(6));
 SK_API tex_t        tex_gen_cubemap_reflection(tex_t source_cubemap, tex_t into sk_default(nullptr), int32_t max_resolution sk_default(64), tex_data_ flags sk_default(tex_data_none));
-// Query after graphics initialization on the SK thread. Tests optimal sampled
-// 2D upload/readback usage and optional linear filtering; false when unavailable.
-SK_API bool32_t     tex_format_supports_sampling(tex_format_ format, bool32_t linear_filter sk_default(true));
 SK_API tex_format_  tex_get_format          (tex_t texture);
 SK_API tex_format_  tex_get_input_format    (tex_t texture);
 SK_API int32_t      tex_get_width           (tex_t texture);
@@ -4711,4 +4708,6 @@ SK_CONST char *default_id_model_controller_r   = "default/model_controller_r";
   // A version in hex looks like: 0xMMMMiiiiPPPPrrrr
   // In order of Major.mInor.Patch.pre-Release
 #define SK_VERSION_ID ( ((uint64_t)SK_VERSION_MAJOR << 48) | ((uint64_t)SK_VERSION_MINOR << 32) | ((uint64_t)SK_VERSION_PATCH << 16) | (uint64_t)(SK_VERSION_PRERELEASE) )
+
+#include "zipzap/texture_api.h"
 

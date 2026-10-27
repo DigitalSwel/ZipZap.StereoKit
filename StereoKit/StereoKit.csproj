@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="ZipZap/ZipZap.Extensions.props" />
+
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework> <!--Update the PDB URL in StereoKit.targets if changing-->
 		<ImplicitUsings>disable</ImplicitUsings>

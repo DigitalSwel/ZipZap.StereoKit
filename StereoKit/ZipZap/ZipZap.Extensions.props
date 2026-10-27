@@ -1,0 +1,8 @@
+<Project>
+	<PropertyGroup>
+		<ZipZapExtensions Condition="'$(ZipZapExtensions)' == ''">true</ZipZapExtensions>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(ZipZapExtensions)' != 'true'">
+		<Compile Remove="ZipZap/**/*.cs" />
+	</ItemGroup>
+</Project>

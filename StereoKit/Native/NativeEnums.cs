@@ -1034,6 +1034,17 @@ namespace StereoKit
 		/// copy, which can be worthwhile for large uploads from a thread that can
 		/// afford to wait. On the main thread, blocking can cause a hitch.</summary>
 		Blocking     = 1 << 16,
+
+		// Released ZipZap names retain their original values.
+		/// <summary>Compatibility name for CompressNone.</summary>
+		[Obsolete("Use CompressNone.")]
+		Uncompressed = CompressNone,
+		/// <summary>Compatibility name for CompressQuality.</summary>
+		[Obsolete("Use CompressQuality.")]
+		Quality = CompressQuality,
+		/// <summary>Compatibility name for CompressSmall.</summary>
+		[Obsolete("Use CompressSmall.")]
+		Small = CompressSmall,
 	}
 
 	/// <summary>How does the shader grab pixels from the texture? Or more

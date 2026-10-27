@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ZipZapExtensions Condition="'$(ZipZapExtensions)' == ''">true</ZipZapExtensions>
+		<DefineConstants Condition="'$(ZipZapExtensions)' == 'true'">$(DefineConstants);ZIPZAP_EXTENSIONS_TEST</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="../../../StereoKit/StereoKit.csproj" />
+	</ItemGroup>
+</Project>

@@ -72,13 +72,13 @@ static void tct_test_families() {
 ///////////////////////////////////////////
 
 static void tct_test_alpha() {
-	const tex_data_ small = tex_data_srgb | tex_data_compress_small;
-	TCT_CHECK(tct_pick(small,                   tct_bc, false) == tex_format_bc1_rgb_srgb,  "small opaque BC picks BC1");
-	TCT_CHECK(tct_pick(small,                   tct_bc, true ) == tex_format_bc7_rgba_srgb, "small BC with alpha keeps real alpha in BC7");
-	TCT_CHECK(tct_pick(small | tex_data_cutout, tct_bc, true ) == tex_format_bc1_rgba_srgb, "cutout alpha takes BC1 punch-through");
-	TCT_CHECK(tct_pick(small | tex_data_opaque, tct_bc, true ) == tex_format_bc1_rgb_srgb,  "opaque drops a present alpha channel");
-	TCT_CHECK(tct_pick(tex_data_srgb,           tct_bc, true ) == tex_format_bc7_rgba_srgb, "quality alpha is BC7");
-	TCT_CHECK(tct_pick(small,                   tct_astc, true) == tex_format_astc6x6_rgba_srgb, "ASTC picks per block, so alpha doesn't change it");
+	const tex_data_ small_policy = tex_data_srgb | tex_data_compress_small;
+	TCT_CHECK(tct_pick(small_policy,                   tct_bc, false) == tex_format_bc1_rgb_srgb,  "small opaque BC picks BC1");
+	TCT_CHECK(tct_pick(small_policy,                   tct_bc, true ) == tex_format_bc7_rgba_srgb, "small BC with alpha keeps real alpha in BC7");
+	TCT_CHECK(tct_pick(small_policy | tex_data_cutout, tct_bc, true ) == tex_format_bc1_rgba_srgb, "cutout alpha takes BC1 punch-through");
+	TCT_CHECK(tct_pick(small_policy | tex_data_opaque, tct_bc, true ) == tex_format_bc1_rgb_srgb,  "opaque drops a present alpha channel");
+	TCT_CHECK(tct_pick(tex_data_srgb,                  tct_bc, true ) == tex_format_bc7_rgba_srgb, "quality alpha is BC7");
+	TCT_CHECK(tct_pick(small_policy,                   tct_astc, true) == tex_format_astc6x6_rgba_srgb, "ASTC picks per block, so alpha doesn't change it");
 }
 
 ///////////////////////////////////////////
@@ -254,24 +254,24 @@ static void tct_test_set_colors() {
 	TCT_CHECK(tex_asset_state(blocking) == asset_state_loaded && tex_get_format(blocking) == expect, "blocking set_colors is loaded on return");
 
 	// Rapid async updates land in order, so the last one wins
-	const int32_t small = 64;
+	const int32_t small_size = 64;
 	tex_t latest = tex_create(tex_type_image_nomips, tex_format_rgba32);
 	for (int32_t i = 0; i < 32; i++) {
-		tct_fill(pixels, small * small, color32{ (uint8_t)i, 0, 0, 255 });
-		tex_set_colors(latest, small, small, pixels, tex_data_srgb | tex_data_compress_none);
+		tct_fill(pixels, small_size * small_size, color32{ (uint8_t)i, 0, 0, 255 });
+		tex_set_colors(latest, small_size, small_size, pixels, tex_data_srgb | tex_data_compress_none);
 	}
 	assets_block_for_priority(INT32_MAX);
-	color32* readback = (color32*)malloc(sizeof(color32) * small * small);
-	tex_get_data(latest, readback, sizeof(color32) * small * small, 0);
+	color32* readback = (color32*)malloc(sizeof(color32) * small_size * small_size);
+	tex_get_data(latest, readback, sizeof(color32) * small_size * small_size, 0);
 	TCT_CHECK(readback[0].r == 31, "the last of many async updates wins");
 
 	// Holding the write lock keeps a replacement in flight, as a slow encode would
 	atomic_exchange_i32(&latest->write_running, 1);
-	tct_fill(pixels, small * small, color32{ 77, 0, 0, 255 });
-	tex_set_colors(latest, small, small, pixels, tex_data_srgb | tex_data_compress_none);
+	tct_fill(pixels, small_size * small_size, color32{ 77, 0, 0, 255 });
+	tex_set_colors(latest, small_size, small_size, pixels, tex_data_srgb | tex_data_compress_none);
 	TCT_CHECK(tex_asset_state(latest) == asset_state_loaded_meta, "a loaded texture reads as loaded_meta while new data is in flight");
 	atomic_exchange_i32(&latest->write_running, 0);
-	tex_get_data(latest, readback, sizeof(color32) * small * small, 0);
+	tex_get_data(latest, readback, sizeof(color32) * small_size * small_size, 0);
 	TCT_CHECK(readback[0].r == 77 && tex_asset_state(latest) == asset_state_loaded, "reading data waits for a replacement to land");
 	free(readback);
 

@@ -2,6 +2,8 @@
 
 Shared fork for Reveal and GargsVR. Upstream source remains in the `StereoKit` namespace and assembly; our NuGet package ID is **ZipZap.StereoKit**.
 
+See [ZipZap extension boundaries and upstream updates](ZIPZAP_EXTENSIONS.md) for the optional native/managed extension build, compatibility boundary, and integration workflow. Package builds explicitly enable the extensions on both native platforms and in the managed assembly. The original package adoption/consumer validation recorded below does not automatically apply to a newer integration or package.
+
 ## Baseline and supported build
 
 - Source baseline: `b8cc3af2619c012ef47579f424756508879f77b1` on `develop`.

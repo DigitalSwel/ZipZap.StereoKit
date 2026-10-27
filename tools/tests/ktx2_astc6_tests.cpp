@@ -1,4 +1,4 @@
-#include "../../StereoKitC/asset_types/ktx2_astc6.h"
+#include "../../StereoKitC/zipzap/ktx2_astc6.h"
 
 #include <stdio.h>
 #include <string.h>
