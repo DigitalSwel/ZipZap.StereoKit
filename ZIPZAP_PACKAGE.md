@@ -4,7 +4,20 @@ Shared fork for Reveal and GargsVR. Upstream source remains in the `StereoKit` n
 
 See [ZipZap extension boundaries and upstream updates](ZIPZAP_EXTENSIONS.md) for the optional native/managed extension build, compatibility boundary, and integration workflow. Package builds explicitly enable the extensions on both native platforms and in the managed assembly. The original package adoption/consumer validation recorded below does not automatically apply to a newer integration or package.
 
-## Latest local extension integration
+## Latest local shader compiler integration
+
+- Integrated upstream PR #1430 commit `e3ab8e716fc8909a338e98440ba3e8068336ca66`; tested merge/source commit **`f3718d82966d789f9cab28e61324691712f8716e`**, merged locally into `develop`.
+- New local package: **`ZipZap.StereoKit/0.4.0-zipzap.5.gf3718d82966d`**, in `bin/nuget-feed/`.
+- Package SHA256: `d4df7c2cfbc6160b9b6cd0ef5f3be506c7ba327f3a1afebe8595cbb62ec81db5`.
+- `sk_renderer/v2026.10.27` uses SVSL for all shaders. HLSL and SVSL remain supported inputs; `SK_USE_SVSL` / `SKUseSVSL` no longer select a backend. glslang is forced OFF even in previously configured caches.
+- Windows shader compiler shrank from **5,568,000 to 643,072 bytes**. Native ASTC6 extensions, compatibility APIs, and shader-cache invalidation remain intact.
+- Windows x64 / Android arm64 Release builds and package payload/provenance checks passed. Extension-enabled/core-only native suites passed, CPU parser passed 1741 checks, and managed API tests passed 11 checks in each mode.
+- All 54 tracked HLSL shaders compiled in Debug and Release. HLSL/SVSL asset and generated-C# builds, incremental no-op, compiler/target/include invalidation, and clean/rebuild passed.
+- An isolated consumer restored only this package, verified native payload identity, and rendered generated HLSL/SVSL PBR materials offscreen for 16 frames with screenshot and clean shutdown.
+- No consumer pins, APKs, device installs, or remote branches changed. Physical Quest visuals/performance and the known Windows minimize/restore defect were not requalified.
+- Completed scope and results: [SVSL integration plan](plans/completed/SVSL_SHADER_COMPILER_INTEGRATION.md).
+
+## Previous local extension integration
 
 - Integrated upstream PR #1429 head `2b6ef4b2084ee9054d1bbe2f170f323c6545034f`; upstream merge commit `60375acb` and isolated extension source commit `73380854999375d817ebb0963fa8aa3e92d933ae`.
 - New local package: **`ZipZap.StereoKit/0.4.0-zipzap.4.g733808549993`**, in `bin/nuget-feed/`.
