@@ -209,6 +209,16 @@ model_t model_copy(model_t model) {
 	}
 	for (int32_t i = 0; i < result->nodes.count; i++) {
 		result->nodes[i].name = string_copy(result->nodes[i].name);
+
+		// The node array copy aliases metadata storage. Each model must own
+		// its dictionary and strings so edits and destruction are independent.
+		result->nodes[i].info = {};
+		int32_t     iterator = 0;
+		const char* key      = nullptr;
+		const char* value    = nullptr;
+		while (model_node_info_iterate(model, i, &iterator, &key, &value)) {
+			model_node_info_set(result, i, key, value);
+		}
 	}
 
 	// If the original Model is animating, we want to set this Model up with

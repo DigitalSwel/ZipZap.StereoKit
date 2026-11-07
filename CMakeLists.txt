@@ -1006,6 +1006,8 @@ if (SK_BUILD_TESTS AND NOT ANDROID AND NOT SK_BUILD_SHARED_LIBS)
     tools/tests/audio_render.cpp
     tools/tests/asset_tests.h
     tools/tests/asset_tests.cpp
+    tools/tests/model_tests.h
+    tools/tests/model_tests.cpp
     tools/tests/sh_tests.h
     tools/tests/sh_tests.cpp
     tools/tests/texcompress_tests.h
