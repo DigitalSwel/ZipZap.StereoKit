@@ -4,14 +4,24 @@ Shared fork for Reveal and GargsVR. Upstream source remains in the `StereoKit` n
 
 See [ZipZap extension boundaries and upstream updates](ZIPZAP_EXTENSIONS.md) for the optional native/managed extension build, compatibility boundary, and integration workflow. Package builds explicitly enable the extensions on both native platforms and in the managed assembly. The original package adoption/consumer validation recorded below does not automatically apply to a newer integration or package.
 
-## Latest DefenderVRS metadata backport (package 6)
+## Latest upstream integration (package 7)
+
+- Current DefenderVRS/Engine package: **`ZipZap.StereoKit/0.4.0-zipzap.7.g8c7fd2d263ff`**, source merge **`8c7fd2d263ff15194139e22e635ea431a54c285b`**. It combines our fork develop with all fetched upstream commits through **`c2c6ec14`** (PR #1433).
+- Package SHA256: **`7c00861bbb9741108ff5ccfb8bd1454e8973041d2e5840feac7edefe6a1398a0`**. The existing ignored local `bin/nuget-feed/` remains the distribution mechanism; no registry/GitHub package release was introduced.
+- Includes the newer develop renderer/shader generation (`sk_renderer/v2026.10.27`, SVSL compiler), openxr_loader_nano, glTF image-sharing and asset-synchronization fixes, plus our ASTC6 compatibility/extensions and Model.Copy metadata ownership fix.
+- Windows/Android package and consumer Release builds passed. Enabled/core-only CTest: 2/2 and 1/1; ASTC6 parser: 1741 checks; managed API: 11 checks in each mode; model suite: 144 checks in each mode. Non-audio native suites and 1196 consumer/editor/browser regressions passed.
+- Actual package HLSL/SVSL/glTF/model-copy/offscreen smoke exits 0. Actual game range (140 frames) and prefab (240 frames) both exit 0 with no swapchain-acquisition errors. Hardware-WPF authoring and both placement paths pass. Windows/APK native libraries and the new APK loader match package provenance.
+- Standalone audio tests still reproduce a pre-existing `0xC0000005` on both old and new develop; physical Quest/Steam Frame and Linux ARM64 qualification remain unverified. See [active integration plan](plans/UPSTREAM_DEVELOP_SYNC.md).
+- On another machine, provision this exact immutable `.nupkg` and verify its hash, or build a new revision from the pinned source and update consumer pins together. Do not rebuild a moving develop under this existing version or assume Git distributes the local feed.
+
+## Previous DefenderVRS metadata backport (package 6)
 
 - Consumer package: **`ZipZap.StereoKit/0.4.0-zipzap.6.g5863048d039a`**, source **`5863048d039a9a194549040d88e964182ae30504`** on `fix/model-copy-metadata-astc6`.
 - Package SHA256: `f95436fb2693d64462166c1f49bbd92e6c45831d2a75181aff6cf5f523681cd0`; provisioned in the existing ignored `bin/nuget-feed/`. The user chose to retain this local-feed workflow, not add a registry or GitHub package release.
 - Fixes independent ownership of copied model-node metadata. The equivalent develop fix is `7247a55f010f6177f483a8b70ecb3ca31847a895`; both source branches are covered by the user's push approval.
 - The package intentionally backports only that fix onto `cf6986582d77`, preserving `sk_renderer/v2026.10.12` and the existing shader generation. Do **not** rebuild this consumer baseline from current develop, which contains newer integrations.
 - Windows x64 / Android arm64 package builds and provenance checks passed. Model/asset suites passed on develop and the backport; **144 model checks, 0 failures**. The original metadata-bearing locomotive copy probe now exits 0, and Windows/Quest output hashes match package payloads.
-- Full desktop acceptance remains blocked by the known swapchain/shutdown failure, also reproduced with the unchanged package 3. Physical Quest qualification remains open. See [active ownership plan](plans/MODEL_COPY_METADATA_OWNERSHIP.md).
+- Full desktop acceptance remains blocked by the known swapchain/shutdown failure, also reproduced with the unchanged package 3. Physical Quest qualification remains open. That checkpoint's blocker passed the package-7 desktop recheck; see the [completed ownership record](plans/completed/MODEL_COPY_METADATA_OWNERSHIP.md).
 - Git push publishes source, not the ignored feed. On another machine, provision the exact revision-6 `.nupkg` and verify its SHA256. Alternatively, build a new immutable package revision from the pinned backport source and update all consumer pins together; do not silently replace revision 6 with rebuilt bytes.
 
 ## Previous local shader compiler integration (package 5)

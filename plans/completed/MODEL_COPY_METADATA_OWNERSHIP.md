@@ -28,7 +28,7 @@ Scratch and logs: repository-root `.tmp/model-copy-metadata/`; compiler/package 
 
 ## Status
 
-Active — scoped fix is implemented, locally committed, packaged and adopted. Native ownership/package checks pass; integrated desktop acceptance remains blocked by the pre-existing graphics/shutdown failure described below. Keep this plan active until its required consumer acceptance passes.
+Completed — native ownership, package checks and integrated desktop acceptance have passed. The later user-approved latest-upstream/package-7 adoption preserved this fix and resolved the earlier desktop acceptance blocker in the recheck. Physical-device qualification remains outside this fix's scope.
 
 ### Source and package provenance
 
@@ -47,10 +47,14 @@ Active — scoped fix is implemented, locally committed, packaged and adopted. N
 - Consumer Windows/Quest/Editor Release builds and affected C# suites passed (139 / 172 / 48 / 81 / 54 / 625); browser suite: 77. Windows DLL and signed Quest APK native hashes match package provenance.
 - Original package-3 native DLL comparison was built in an isolated consumer output; production source pins stayed on package 6.
 
-### Remaining acceptance blocker
+### Earlier acceptance blocker
 
 The fixed package renders the full train prefab, but the longer Windows game smoke reaches its frame budget and then times out with `[skr] Failed to acquire swapchain image: 0x1`. An unchanged-range 140-frame comparison using the exact original package-3 DLL reproduces the same failure. This is the already-known renderer/lifecycle problem, outside the requested metadata-only delta; do not report clean integrated shutdown or broaden the native patch silently.
 
 The current desktop also produced white hardware-WPF shell captures. UI automation works; a scratch-only software-WPF launcher renders correctly and passes standalone prefab authoring plus both environment-placement paths. No shipped WPF fallback was added. Hardware UI acceptance needs a healthy-desktop rerun. Physical Quest rendering/performance remains unverified.
 
-Detailed consumer evidence/status: `D:/_repos/DefenderVRS/plans/ZIPZAP_EDITOR_PREFABS.md` and that repository's `.tmp/zipzap-editor-prefabs/`. Native source/package/test logs remain under `.tmp/model-copy-metadata/`.
+### Final acceptance after latest-upstream adoption
+
+Package `0.4.0-zipzap.7.g8c7fd2d263ff` includes the original ownership fix plus the user's subsequently approved upstream integration. Enabled/core-only native model suites still pass 144 checks each. The actual package probe copies the unchanged metadata-bearing locomotive, renders and exits 0. Actual game range (140 frames) and full prefab (240 frames) now both exit 0, with no swapchain-acquisition errors. Hardware-WPF authoring and both environment-placement paths also pass with complete rendered shell chrome. No metadata stripping, static-model workaround or shipped WPF fallback was introduced. See the separate active [upstream integration plan](../UPSTREAM_DEVELOP_SYNC.md) for package-7 provenance and the unrelated baseline audio-suite/device gaps.
+
+Detailed consumer evidence/status: `D:/_repos/DefenderVRS/plans/completed/ZIPZAP_EDITOR_PREFABS.md` and that repository's `.tmp/zipzap-editor-prefabs/`. Native source/package/test logs remain under `.tmp/model-copy-metadata/`.
