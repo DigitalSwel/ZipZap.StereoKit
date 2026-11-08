@@ -4,7 +4,17 @@ Shared fork for Reveal and GargsVR. Upstream source remains in the `StereoKit` n
 
 See [ZipZap extension boundaries and upstream updates](ZIPZAP_EXTENSIONS.md) for the optional native/managed extension build, compatibility boundary, and integration workflow. Package builds explicitly enable the extensions on both native platforms and in the managed assembly. The original package adoption/consumer validation recorded below does not automatically apply to a newer integration or package.
 
-## Latest local shader compiler integration
+## Latest DefenderVRS metadata backport (package 6)
+
+- Consumer package: **`ZipZap.StereoKit/0.4.0-zipzap.6.g5863048d039a`**, source **`5863048d039a9a194549040d88e964182ae30504`** on `fix/model-copy-metadata-astc6`.
+- Package SHA256: `f95436fb2693d64462166c1f49bbd92e6c45831d2a75181aff6cf5f523681cd0`; provisioned in the existing ignored `bin/nuget-feed/`. The user chose to retain this local-feed workflow, not add a registry or GitHub package release.
+- Fixes independent ownership of copied model-node metadata. The equivalent develop fix is `7247a55f010f6177f483a8b70ecb3ca31847a895`; both source branches are covered by the user's push approval.
+- The package intentionally backports only that fix onto `cf6986582d77`, preserving `sk_renderer/v2026.10.12` and the existing shader generation. Do **not** rebuild this consumer baseline from current develop, which contains newer integrations.
+- Windows x64 / Android arm64 package builds and provenance checks passed. Model/asset suites passed on develop and the backport; **144 model checks, 0 failures**. The original metadata-bearing locomotive copy probe now exits 0, and Windows/Quest output hashes match package payloads.
+- Full desktop acceptance remains blocked by the known swapchain/shutdown failure, also reproduced with the unchanged package 3. Physical Quest qualification remains open. See [active ownership plan](plans/MODEL_COPY_METADATA_OWNERSHIP.md).
+- Git push publishes source, not the ignored feed. On another machine, provision the exact revision-6 `.nupkg` and verify its SHA256. Alternatively, build a new immutable package revision from the pinned backport source and update all consumer pins together; do not silently replace revision 6 with rebuilt bytes.
+
+## Previous local shader compiler integration (package 5)
 
 - Integrated upstream PR #1430 commit `e3ab8e716fc8909a338e98440ba3e8068336ca66`; tested merge/source commit **`f3718d82966d789f9cab28e61324691712f8716e`**, merged locally into `develop`.
 - New local package: **`ZipZap.StereoKit/0.4.0-zipzap.5.gf3718d82966d`**, in `bin/nuget-feed/`.
